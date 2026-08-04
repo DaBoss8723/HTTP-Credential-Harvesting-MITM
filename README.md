@@ -23,33 +23,39 @@ This engagement was performed within an isolated VirtualBox homelab to demonstra
 Connectivity to the target was first confirmed with ICMP, followed by a ping sweep of the full /24 subnet to enumerate live hosts.
 
 ![Connectivity to 192.168.100.50 confirmed via ICMP](images/image1.png)
+
 *Figure 1 — Connectivity to 192.168.100.50 confirmed via ICMP.*
 
 ![Nmap ping sweep identifies three live hosts](images/image2.png)
+
 *Figure 2 — Nmap ping sweep of 192.168.100.0/24 identifies three live hosts, including the target at .50.*
 
 ## 4. Target Discovery and Port Scanning
 A full TCP port scan of the target was run to identify the complete set of listening services.
 
 ![Full TCP port scan reveals 28 open ports](images/image3.png)
+
 *Figure 3 — Full TCP port scan of 192.168.100.50 reveals 28 open ports, indicating a large attack surface.*
 
 ## 5. Service Enumeration
 Version and service detection was run against the key ports to fingerprint the software stack and identify immediately notable misconfigurations, including anonymous FTP access on vsftpd 2.3.4.
 
 ![Service/version enumeration results](images/image4.png)
+
 *Figure 4 — Service/version enumeration identifies vsftpd 2.3.4 with anonymous login enabled, OpenSSH 4.7p1, and Apache 2.2.8 hosting the DVWA/Metasploitable2 application.*
 
 ## 6. Live Traffic Capture
 With the target's HTTP service identified, Wireshark was used to capture live traffic on the attacker interface while an authentication event was triggered against the DVWA login page.
 
 ![Wireshark capture of the TCP stream](images/image5.png)
+
 *Figure 5 — Wireshark capture of the TCP stream covering the logout, login page request, and POST login events.*
 
 ## 7. Credential Interception
 Following the TCP stream isolated the full HTTP request/response cycle for the login POST, revealing the credentials submitted in the clear.
 
 ![Follow TCP Stream output showing the POST body](images/image6.png)
+
 *Figure 6 — Follow TCP Stream output showing the POST body submitted to /dvwa/login.php.*
 
 ### Credentials Recovered
@@ -63,6 +69,7 @@ The session cookie (`PHPSESSID`) was also observed unencrypted and remained stat
 The full unencrypted request/response flow between the attacker and the web server is mapped below, from the initial logout through to authenticated session access.
 
 ![Sequence diagram of the unencrypted HTTP authentication flow](images/image7.png)
+
 *Figure 7 — Sequence diagram of the unencrypted HTTP authentication flow between 192.168.100.100 and 192.168.100.50.*
 
 ## 9. Findings and Recommendations
